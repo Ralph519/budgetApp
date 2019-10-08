@@ -45,6 +45,7 @@
                                             @focus="$event.target.select()"
                                             ref="email"
                                             autocomplete="off"
+                                            v-model="email"
                                         >
                                     </div>    
                                 </div>
@@ -63,6 +64,7 @@
                                             ref="password"
                                             placeholder="Password"
                                             autocomplete="off"
+                                            v-model="password"
                                         >
                                     </div>
                                 </div>
@@ -70,7 +72,12 @@
                         </div>
 
                         <div class="col-md-12">
-                            <button class="btn btn-primary form-control">Register</button>
+                            <button 
+                                class="btn btn-primary form-control"
+                                @click="register"
+                            >
+                                Register
+                            </button>
                         </div>
                     </small>
                 </div>
@@ -81,8 +88,17 @@
 </template>
 
 <script>
+import db from '../firebase'
+import Swal from 'sweetalert2'
+
 export default {
     name: 'register',
+    data() {
+        return {
+            email: '',
+            password: ''
+        }
+    },
     mounted() {
         this.showRegisterModal()
     },
@@ -90,6 +106,24 @@ export default {
         this.showRegisterModal()
     },
     methods: {
+        register(){
+            const t = this;
+
+            db
+            .app
+            .auth()
+            .createUserWithEmailAndPassword(t.email,t.password)
+            .then(() => {
+                this.$router.go({path: this.$router.path})
+            },
+            err => {
+                Swal.fire({
+                    type: 'error',
+                    title: 'Oops...',
+                    text: err.message,
+                })
+            })
+        },
         hideRegisterModal() {
             this.$modal.hide('registerModal')
         },

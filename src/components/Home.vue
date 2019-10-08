@@ -1,11 +1,31 @@
 <template>
     <div class="container mt-5" id="Home">
 
+        <div class="col-md-12">
+          <div class="row">
+            <div class="card border-success col-md-4 col-sm-4 mb-3">
+              <div class="form-group">
+                <label for="budgetList">Budget Name</label>
+                <select class="form-control" id="budgetList" v-model="selectedBudgetId" >
+                  <option 
+                    v-for="budget in budgets" 
+                    :key=budget.budgetId
+                    v-bind:value="budget.budgetId"
+                    @change="checkData()"
+                  >
+                    {{budget.name}}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="col-sm-12 col-md-12">
           <div class="row">
-
+            
             <div class="card border-success col-md-4 col-sm-4 mb-3">
-              <div class="card-header">Budget</div>
+              <div class="card-header">Budget </div>
               <div class="card-body">
                 <div class="form-group">
                   <label class="col-form-label" for="budget">Please enter your budget</label>
@@ -74,7 +94,33 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
+// import Swal from 'sweetalert2'
+
 export default {
-    name: 'home'
+    name: 'home',
+    data(){
+      return {
+        selectedBudgetId: '',
+        budget: 0
+      }
+    },
+    created(){
+      const t = this
+
+      t.$store.dispatch('getBudgetExpenses')
+    },
+    computed:  {
+        ...mapState(['budgets']),
+    },
+    methods: {
+      checkData() {
+        // const t = this;
+
+        // t.budget = budget
+        console.log('test')
+      }
+    }
 }
 </script>

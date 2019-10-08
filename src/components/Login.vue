@@ -45,6 +45,7 @@
                                             @focus="$event.target.select()"
                                             ref="email"
                                             autocomplete="off"
+                                            v-model="email"
                                         >
                                     </div>    
                                 </div>
@@ -63,6 +64,7 @@
                                             ref="password"
                                             placeholder="Password"
                                             autocomplete="off"
+                                            v-model="password"
                                         >
                                     </div>
                                 </div>
@@ -70,25 +72,34 @@
                         </div>
 
                         <div class="col-md-12">
-                            <button class="btn btn-primary form-control">Login</button>
+                            <button 
+                                class="btn btn-primary form-control"
+                                @click="login"
+                            >
+                                Login
+                            </button>
                         </div>
 
                     </small>
                 </div>
 
-                <!-- <div class="card-footer">
-                    <div class="text-right">
-                        <a href="#!" class="btn btn-secondary btn-sm" @click="hideLoginModal">Close</a>
-                    </div>
-                </div> -->
             </div>
         </modal>
     </div>
 </template>
 
 <script>
+import db from '../firebase'
+import Swal from 'sweetalert2'
+
 export default {
     name: 'login',
+    data() {
+        return {
+            email: '',
+            password: ''
+        }
+    },
     mounted() {
         const t = this;
 
@@ -100,6 +111,52 @@ export default {
         t.$modal.show('loginModal')
     },
     methods: {
+        login(){
+            const t = this;
+
+            if (t.email == ''){
+                Swal.fire({
+                    type: 'error',
+                    title: 'Oops...',
+                    text: 'Email should not be blank',
+                    onAfterClose: () => t.$refs.email.focus(),
+                })
+
+                return
+            }
+
+            if (t.password == ''){
+                Swal.fire({
+                    type: 'error',
+                    title: 'Oops...',
+                    text: 'Password should not be blank',
+                    onAfterClose: () => t.$refs.password.focus(),
+                })
+
+                return
+            }
+
+            db
+            .app
+            .auth()
+            .signInWithEmailAndPassword(t.email,t.password)
+            .then(() => {
+                // Swal.fire(
+                // 'You are logged in',
+                // `as ${user.user.email}`,
+                // 'success'
+                // )
+                // this.$router.push('/')
+                this.$router.go({path: this.$router.path})
+            },
+            err => {
+                Swal.fire({
+                    type: 'error',
+                    title: 'Oops...',
+                    text: err.message,
+                })
+            })
+        },
         hideLoginModal() {
             this.$modal.hide('loginModal')
         },

@@ -6,21 +6,48 @@
         </button>
 
       <div class="collapse navbar-collapse" id="navbarColor01">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
+        <ul class="navbar-nav ml-auto">
+            <!-- <li v-if="isLoggedIn" class="nav-item active">
                 <router-link to="/" class="nav-link">Home</router-link>    
-            </li>
-            <li class="nav-item">
+            </li> -->
+            <li v-if="isLoggedIn"><p class="mt-2 pr-3"><strong>{{currentUser}}</strong></p></li>
+            <li v-if="!isLoggedIn" class="nav-item">
                 <router-link to="/login" class="nav-link">Login</router-link>    
             </li>
-            <li class="nav-item">
-                <!-- <a class="nav-link" href="#">Register</a> -->
+            <li v-if="!isLoggedIn" class="nav-item">
                 <router-link to="/register" class="nav-link">Register</router-link>    
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Logout</a>
+            <li v-if="isLoggedIn" class="nav-item">
+                <a class="nav-link text-right" href="#" @click="logout">Logout</a>
             </li>
         </ul>
     </div>
     </nav>
 </template>
+
+<script>
+import db from '../../firebase'
+
+export default {
+    name: 'navbar',
+    data() {
+        return {
+            isLoggedIn: false,
+            currentUser: false,
+        }
+    },
+    created(){
+        if(db.app.auth().currentUser){
+            this.isLoggedIn = true
+            this.currentUser = db.app.auth().currentUser.email
+        }
+    },
+    methods: {
+        logout() {
+            db.app.auth().signOut().then(() => {
+                this.$router.go({path: this.$router.path})
+            })
+        }
+    }
+}
+</script>
