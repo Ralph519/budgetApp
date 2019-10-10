@@ -18,7 +18,7 @@ export const store = new Vuex.Store({
         }
     },
     actions: {
-        async getBudgetExpenses({commit}) {
+        async getBudget({commit}) {
             let budgetTmp = []
             await db.collection('budget')
             .where('userEmail','==', db.app.auth().currentUser.email)
@@ -36,7 +36,7 @@ export const store = new Vuex.Store({
 
               commit('setBudget', budgetTmp)
             })
-        }
+        },
     }
 
 })

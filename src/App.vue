@@ -12,6 +12,11 @@ export default {
   name: 'app',
   components: {
     navbar,
+  },
+  created() {
+    const t = this
+    
+    t.$store.dispatch('getBudget')
   }
 }
 </script>
