@@ -111,7 +111,7 @@
                   <input 
                     type="text" 
                     class="form-control" 
-                    placeholder="Expense for the day" 
+                    placeholder="  /  /    " 
                     id="expenseFor"
                     ref="expenseFor"
                     v-model="expenseFor"
