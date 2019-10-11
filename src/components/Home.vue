@@ -176,18 +176,18 @@ export default {
       return {
         expenses: [],
         selectedBudgetId: '',
-        budget: 0,
-        ttlExpenses: 0,
-        expenseAmt: 0,
+        budget: 0.00,
+        ttlExpenses: 0.00,
+        expenseAmt: 0.00,
         expenseDesc: '',
-        balance: 0,
+        balance: 0.00,
         expenseFor: '',
         money: { /* v-money setttings */
           decimal: '.',
           thousands: ',',
           prefix: '',
           suffix: '',
-          precision: 0,
+          precision: 2,
           masked: false /* doesn't work with directive */
         },
       }
@@ -219,14 +219,17 @@ export default {
                 querySnapshot.forEach((doc) => {
                     expensesTmp.push({
                         id: doc.data().id,
-                        amount: doc.data().amount,
+                        amount: parseFloat(doc.data().amount),
                         description: doc.data().description,
                         createdDate: doc.data().forDate.seconds,
                     })
-                    t.ttlExpenses = t.ttlExpenses + parseFloat(doc.data().amount)
                 })
 
                 t.expenses = expensesTmp
+                
+                t.expenses.forEach(element => {
+                  t.ttlExpenses = t.ttlExpenses + parseFloat(element.amount) 
+                });
                 t.balance = parseFloat(t.budget) - t.ttlExpenses
                 // console.log(t.expenses)
             })
@@ -263,7 +266,7 @@ export default {
         let newDateTS = new Date(newDate).getTime() / 1000
         db.collection('expenses')
           .add({
-            amount: t.expenseAmt,
+            amount: parseFloat(t.expenseAmt.replace(',','')),
             description: t.expenseDesc,
             forDate: newDate,
             budgetId: t.selectedBudgetId
@@ -271,16 +274,20 @@ export default {
           .then(docRef => {
             t.expenses.unshift({
                 id: docRef.id,
-                amount: t.expenseAmt,
+                amount: parseFloat(t.expenseAmt.replace(',','')),
                 description: t.expenseDesc,
                 createdDate: newDateTS
             })
-            t.ttlExpenses = t.ttlExpenses + parseFloat(t.expenseAmt)
+            t.ttlExpenses = t.ttlExpenses + parseFloat(t.expenseAmt.replace(',',''))
             t.balance = parseFloat(t.budget) - t.ttlExpenses
 
             t.expenseDesc = ''
             t.expenseAmt = 0
             t.expenseFor = ''
+
+            t.$nextTick(() => {
+              t.$refs.expenseDesc.focus()
+            })
           })
       }
     },
