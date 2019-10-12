@@ -13,14 +13,18 @@
                   @change="getBudget"
                 >
                   <option 
-                    v-for="budget in budgets" 
+                    v-for="(budget,index) in budgets" 
                     :key=budget.budgetId
                     v-bind:value="budget.budgetId"
+                    @change="setBudgetIndex(index)"
                   >
                     {{budget.name}}
                   </option>
                 </select>
-                <small class="text-right"><a href="#!" @click="showNewBudgetModal">Create New Budget</a></small>
+                <small>
+                  <a href="#!" class="float-left mt-2" @click="showNewBudgetModal"><i class="far fa-calendar-plus mr-1"></i>Create New Budget</a>
+                  <a href="#!" class="float-right text-danger mt-2" @click="DeleteBudget"><i class="far fa-trash-alt mr-1"></i>Delete this budget</a>
+                </small>
               </div>
 
               
@@ -273,6 +277,7 @@ export default {
         },
         newBudget: 0.00,
         newBudgetName: '',
+        budgetIndex: 0,
       }
     },
     created(){
@@ -351,6 +356,9 @@ export default {
       },
       AddNewBudget(){
         const t = this
+
+        t.newBudget = 0
+        t.newBudgetName = ''
 
         if (t.newBudgetName==''){
            Swal.fire({
@@ -456,6 +464,31 @@ export default {
             })
           })
       },
+      DeleteBudget(){
+        const t = this
+
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "Continue deleting this Budget?",
+          type: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+          if (result.value) {
+
+            db.collection('budget').doc(t.selectedBudgetId).delete()
+
+            t.$store.state.budgets.splice(t.budgetIndex,1)
+            t.selectedBudgetId = ''
+            t.budget = 0
+            t.ttlExpenses = 0
+            t.balance = 0
+            t.expenses = []
+          }
+        })
+      },
       DeleteExpense(expenseId, index) {
         const t = this;
 
@@ -524,6 +557,11 @@ export default {
         const t = this
 
         t.$modal.show('newBudgetModal')       
+      },
+      setBudgetIndex(index){
+        const t = this
+
+        t.budgetIndex = index
       }
     },
     directives: {mask, money: VMoney}
