@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Home from '@/components/Home'
 import Login from '@/components/Login'
 import Register from '@/components/Register'
+import NewBudget from '@/components/NewBudget'
 
 import db from '../firebase'
 
@@ -17,6 +18,15 @@ let router = new Router({
       meta: {
         requiresAuth: true
       }
+    },
+    {
+      path: '/newbudget',
+      name: 'newbudget',
+      component: NewBudget,
+      meta: {
+        requiresAuth: true
+      }
+      
     },
     {
       path: '/login',

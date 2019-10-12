@@ -10,6 +10,7 @@
                   class="form-control" 
                   id="budgetList" 
                   v-model="selectedBudgetId"
+                  @change="getBudget"
                 >
                   <option 
                     v-for="budget in budgets" 
@@ -19,7 +20,10 @@
                     {{budget.name}}
                   </option>
                 </select>
+                <small class="text-right"><a href="#!" @click="showNewBudgetModal">Create New Budget</a></small>
               </div>
+
+              
             </div>
           </div>
         </div>
@@ -37,9 +41,10 @@
                     class="form-control" 
                     placeholder="Budget 
                     input" id="budget"
-                    v-model="budget"
+                    v-model.lazy="budget"
+                    @focus="$event.target.select()"
                   >
-                  <button type="button" class="form-control btn btn-success mt-2">Calculate</button>
+                  <button type="button" class="form-control btn btn-success mt-2" @click="updateBudget">Calculate</button>
                 </div>
               </div>
             </div>
@@ -72,9 +77,12 @@
         <div class="col-sm-12 col-md-12">
           <div class="row">
             <div class="col-md-4 text-center">
-              <h4 class="text-success">BALANCE</h4>
-              <i class="fas fa-dollar-sign fa-3x text-success"></i>
-              <h3 class="text-success">{{balance | formatNumber}}</h3>
+              <h4 v-if="balance>0" class="text-success">BALANCE</h4>
+              <h4 v-else class="text-danger">BALANCE</h4>
+              <i v-if="balance>0" class="fas fa-dollar-sign fa-3x text-success"></i>
+              <i v-else class="fas fa-dollar-sign fa-3x text-danger"></i>
+              <h3 v-if="balance>0" class="text-success">{{balance | formatNumber}}</h3>
+              <h3 v-else class="text-danger">{{balance | formatNumber}}</h3>
               <hr>
             </div>
           </div>
@@ -135,30 +143,103 @@
 
         <div class="col-md-12 col-sm-12">
           <div class="row">
-            <div class="card border-primary col-md-4 col-sm-4 mb-3">
-              <h3 class="card-header">Expenses</h3>
+            <div class="card border-danger col-md-4 col-sm-4 mb-3">
+              <h3 class="card-header text-secondary">Expenses</h3>
               <div class="card-body">
-                <div class="form-group">
-                  <ul class="list-group">
-                      <li 
-                        v-for="expense in expenses"
-                        :key=expense.id
-                        class="list-group-item"
-                      >
-                        <span class="text-left"><strong>{{expense.description}}</strong></span>
-                        <!-- <br/>
-                        <small>{{expense.createdDate}}</small> -->
-                        <span style="font-size: 18px;" class="float-right">{{expense.amount | formatNumber}}</span>
-                        <p><small>{{expense.createdDate | formatDate}}</small></p>
-                      </li>
-                    </ul>
+                <div class="col-md-12 border-bottom mt-1" v-for="(expense, index) in expenses" :key=expense.id>
+                  <span class="text-left"><strong>{{expense.description}}</strong></span>
+                  <span style="font-size: 18px;" class="float-right">
+                    {{expense.amount | formatNumber}} 
+                    <a href="#!" 
+                      class="ml-3 text-danger" 
+                      @click="DeleteExpense(expense.id, index)">
+                      <i class="far fa-trash-alt"></i>
+                    </a>
+                  </span>
+                  <p><small>{{expense.createdDate | formatDate}}</small></p>
+                </div>
+                <div v-if="expenses.length<=0" class="col-md-12">
+                  <span><p class="text-danger">No expenses for this budget yet</p></span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-   
+        <!-- New Budget Modal -->
+
+        <modal
+            name="newBudgetModal"
+            transition="nice-modal-fade"
+            height="auto"
+            :width="350"
+            :delay="100"
+        >
+            <div class="card border-secondary">
+                <div class="card-header pt-3">
+                    <h5 class="card-title text-primary">
+                        Add New Budget
+                        <button
+                            type="button"
+                            class="close"
+                            @click="hideNewBudgetModal"
+                        >
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </h5>
+                </div>
+                <div class="card-body mb-5">
+                    <small>
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="newBudgetName"><i class="fas fa-file-invoice-dollar mr-2"></i>Budget Name</label>
+                                        <input 
+                                            type="newBudgetName" 
+                                            name="newBudgetName" 
+                                            id="newBudgetName" 
+                                            class="form-control form-control-sm"
+                                            placeholder="Budget Name"
+                                            @focus="$event.target.select()"
+                                            ref="newBudgetName"
+                                            autocomplete="off"
+                                            v-model="newBudgetName"
+                                        >
+                                    </div>    
+                                    <div class="form-group">
+                                        <label for="newBudget"><i class="fas fa-hand-holding-usd mr-2"></i>Budget Amount</label>
+                                        <input 
+                                            type="newBudget" 
+                                            name="newBudget" 
+                                            id="newBudget" 
+                                            class="form-control form-control-sm"
+                                            placeholder="Budget Amount"
+                                            @focus="$event.target.select()"
+                                            ref="newBudget"
+                                            autocomplete="off"
+                                            v-model="newBudget"
+                                        >
+                                    </div>    
+                                </div>
+                            </div>
+                        </div>
+                      
+
+                        <div class="col-md-12">
+                            <button 
+                                class="btn btn-primary form-control"
+                                @click="AddNewBudget"
+                            >
+                                Add New Budget
+                            </button>
+                        </div>
+
+                    </small>
+                </div>
+
+            </div>
+        </modal>
 
       </div>
 </template>
@@ -190,23 +271,16 @@ export default {
           precision: 2,
           masked: false /* doesn't work with directive */
         },
+        newBudget: 0.00,
+        newBudgetName: '',
       }
     },
     created(){
       const t = this
       
-      t.loadData()
-    },
-    computed:  {
-        ...mapState(['budgets']),
-    },
-    methods: {
-      loadData(){
-        const t = this
-        
-        let expensesTmp = []
+      let expensesTmp = []
 
-        t.$store.subscribe((mutation, state) => {
+      t.$store.subscribe((mutation, state) => {
           if (mutation.type === 'setBudget') {
             t.selectedBudgetId = state.budgets[0].budgetId
             t.budget = state.budgets[0].budget
@@ -218,7 +292,7 @@ export default {
               .then(querySnapshot => {
                 querySnapshot.forEach((doc) => {
                     expensesTmp.push({
-                        id: doc.data().id,
+                        id: doc.id,
                         amount: parseFloat(doc.data().amount),
                         description: doc.data().description,
                         createdDate: doc.data().forDate.seconds,
@@ -226,16 +300,110 @@ export default {
                 })
 
                 t.expenses = expensesTmp
-                
-                t.expenses.forEach(element => {
-                  t.ttlExpenses = t.ttlExpenses + parseFloat(element.amount) 
-                });
-                t.balance = parseFloat(t.budget) - t.ttlExpenses
-                // console.log(t.expenses)
+
+                t.calcExpenses()
             })
 
           }
         })
+    },
+    computed:  {
+        ...mapState(['budgets']),
+    },
+    methods: {
+      getBudget(){
+        const t = this;
+
+        t.budget = 0.00
+
+        db.collection('budget')
+          .doc(t.selectedBudgetId)
+          .get()
+          .then(snapshot => {
+            if(snapshot.exists){
+              t.budget = parseFloat(snapshot.data().budget)
+              t.loadExpenseData()
+            }
+          })
+
+      },  
+      updateBudget(){
+        const t = this;
+
+        db.collection('budget')
+          .doc(t.selectedBudgetId)
+          .update('budget',t.budget)
+        t.loadExpenseData()
+
+        Swal.fire(
+          'Updated!',
+          'New budget have been applied',
+          'success'
+        )
+      },
+      loadExpenseData(){
+        const t = this
+        
+        t.expenses = []
+        
+        t.balance = 0.00
+        t.ttlExpenses = 0.00
+
+        let expensesTmp = []
+
+        db.collection('expenses')
+          .where('budgetId','==', t.selectedBudgetId)
+          .orderBy('forDate','desc')
+          .get()
+          .then(querySnapshot => {
+            querySnapshot.forEach((doc) => {
+                expensesTmp.push({
+                    id: doc.id,
+                    amount: parseFloat(doc.data().amount),
+                    description: doc.data().description,
+                    createdDate: doc.data().forDate.seconds,
+                })
+            })
+
+            t.expenses = expensesTmp
+
+            t.calcExpenses()
+        })
+
+      },
+      AddNewBudget(){
+        const t = this
+
+        if (t.newBudgetName==''){
+           Swal.fire({
+                type: 'error',
+                title: 'Oops...',
+                text: 'Budget Name must not be blank',
+                onAfterClose: () => t.$refs.newBudgetName.focus(),
+            })
+
+            return
+        }
+
+        if (t.newBudget==0){
+           Swal.fire({
+                type: 'error',
+                title: 'Oops...',
+                text: 'Budget Amount must not be zero',
+                onAfterClose: () => t.$refs.newBudget.focus(),
+            })
+
+            return
+        }
+
+        db.collection('budget')
+          .add({
+            budget: parseFloat(t.newBudget),
+            createdDate: new Date(),
+            name: t.newBudgetName,
+            userEmail: db.app.auth().currentUser.email
+          })
+
       },
       AddNewExpense(){
         const t = this
@@ -289,6 +457,41 @@ export default {
               t.$refs.expenseDesc.focus()
             })
           })
+      },
+      DeleteExpense(expenseId, index) {
+        const t = this;
+
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "Continue deleting this expense?",
+          type: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+          if (result.value) {
+
+            db.collection('expenses').doc(expenseId).delete()
+
+            t.expenses.splice(index,1)
+            t.calcExpenses()
+          }
+        })
+      },
+      calcExpenses(){
+        const t = this
+        t.ttlExpenses = 0
+        t.expenses.forEach(element => {
+          t.ttlExpenses = t.ttlExpenses + parseFloat(element.amount) 
+        });
+        t.balance = parseFloat(t.budget) - t.ttlExpenses
+      },
+      hideNewBudgetModal() {
+        this.$modal.hide('newBudgetModal')
+      },
+      showNewBudgetModal() {
+        this.$modal.show('newBudgetModal')
       }
     },
     directives: {mask, money: VMoney}

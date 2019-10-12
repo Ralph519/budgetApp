@@ -7,9 +7,6 @@
 
       <div class="collapse navbar-collapse" id="navbarColor01">
         <ul class="navbar-nav ml-auto">
-            <!-- <li v-if="isLoggedIn" class="nav-item active">
-                <router-link to="/" class="nav-link">Home</router-link>    
-            </li> -->
             <li v-if="isLoggedIn"><p class="mt-2 pr-3"><strong>{{currentUser}}</strong></p></li>
             <li v-if="!isLoggedIn" class="nav-item">
                 <router-link to="/login" class="nav-link">Login</router-link>    

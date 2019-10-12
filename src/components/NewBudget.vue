@@ -1,16 +1,16 @@
 <template>
-    <div id="Login">
+    <div id="NewBudget">
         <div class="container">
             <div class="col-md-12 text-right mt-2">
                 <small>
-                    <a href="#!" class=" text-secondary" @click="showloginModal">Show Login</a>
+                    <a href="#!" class=" text-secondary" @click="showNewBudgetModal">Add New Budget</a>
                 </small>
             </div>
             
         </div>
         
         <modal
-            name="loginModal"
+            name="newBudgetModal"
             transition="nice-modal-fade"
             height="auto"
             :width="350"
@@ -19,11 +19,11 @@
             <div class="card border-secondary">
                 <div class="card-header pt-3">
                     <h5 class="card-title text-primary">
-                        Login
+                        Add New Budget
                         <button
                             type="button"
                             class="close"
-                            @click="hideLoginModal"
+                            @click="hideNewBudgetModal"
                         >
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -35,54 +35,31 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label for="email"><i class="far fa-envelope mr-2"></i>Email</label>
+                                        <label for="newBudget"><i class="fas fa-hand-holding-usd mr-2"></i>Budget Amount</label>
                                         <input 
-                                            type="email" 
-                                            name="email" 
-                                            id="email" 
+                                            type="newBudget" 
+                                            name="newBudget" 
+                                            id="newBudget" 
                                             class="form-control form-control-sm"
-                                            placeholder="Email"
+                                            placeholder="Budget Amount"
                                             @focus="$event.target.select()"
-                                            ref="email"
+                                            ref="newBudget"
                                             autocomplete="off"
-                                            v-model="email"
+                                            v-model="newBudget"
                                         >
                                     </div>    
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-12">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label for="password"><i class="fas fa-lock mr-2"></i>Password</label>
-                                        <input 
-                                            type="password" 
-                                            name="password" 
-                                            id="password" 
-                                            class="form-control form-control-sm"
-                                            ref="password"
-                                            placeholder="Password"
-                                            autocomplete="off"
-                                            v-model="password"
-                                            @keydown.enter="login"
-                                        >
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                      
 
                         <div class="col-md-12">
                             <button 
                                 class="btn btn-primary form-control"
                                 @click="login"
                             >
-                                Login
+                                Add New Budget
                             </button>
-                        </div>
-
-                        <div class="col-md-12">
-                            Don't have an account yet? <router-link to="/register">Register</router-link>
                         </div>
 
                     </small>
@@ -98,22 +75,21 @@ import db from '../firebase'
 import Swal from 'sweetalert2'
 
 export default {
-    name: 'login',
+    name: 'newbudget',
     data() {
         return {
-            email: '',
-            password: ''
+            newBudget: 0.00,
         }
     },
     mounted() {
         const t = this;
 
-        t.$modal.show('loginModal')
+        t.$modal.show('newBudgetModal')
     },
     created() {
         const t = this;
 
-        t.$modal.show('loginModal')
+        t.$modal.show('newBudgetModal')
     },
     methods: {
         login(){
@@ -156,11 +132,11 @@ export default {
                 })
             })
         },
-        hideLoginModal() {
-            this.$modal.hide('loginModal')
+        hideNewBudgetModal() {
+            this.$modal.hide('newBudgetModal')
         },
-        showloginModal() {
-            this.$modal.show('loginModal')
+        showNewBudgetModal() {
+            this.$modal.show('newBudgetModal')
         }
     }
 }
