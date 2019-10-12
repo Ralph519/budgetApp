@@ -94,7 +94,7 @@
             <div class="card text-white col-md-4 col-sm-4 bg-danger mb-3">
               <div class="card-body">
                 <div class="form-group">
-                  <label class="col-form-label" for="expensedesc">Decription of expense</label>
+                  <label class="col-form-label" for="expensedesc">Description of expense</label>
                   <input 
                     type="text" 
                     class="form-control" 
@@ -278,34 +278,12 @@ export default {
     created(){
       const t = this
       
-      let expensesTmp = []
+      t.subscribeToBudgetData()
+    },
+    mounted(){
+      const t = this
 
-      t.$store.subscribe((mutation, state) => {
-          if (mutation.type === 'setBudget') {
-            t.selectedBudgetId = state.budgets[0].budgetId
-            t.budget = state.budgets[0].budget
-
-            db.collection('expenses')
-              .where('budgetId','==', t.selectedBudgetId)
-              .orderBy('forDate','desc')
-              .get()
-              .then(querySnapshot => {
-                querySnapshot.forEach((doc) => {
-                    expensesTmp.push({
-                        id: doc.id,
-                        amount: parseFloat(doc.data().amount),
-                        description: doc.data().description,
-                        createdDate: doc.data().forDate.seconds,
-                    })
-                })
-
-                t.expenses = expensesTmp
-
-                t.calcExpenses()
-            })
-
-          }
-        })
+      t.subscribeToBudgetData()
     },
     computed:  {
         ...mapState(['budgets']),
@@ -396,14 +374,34 @@ export default {
             return
         }
 
+        let newDate = new Date()
+        let newDateTS = new Date(newDate).getTime() / 1000
         db.collection('budget')
           .add({
             budget: parseFloat(t.newBudget),
-            createdDate: new Date(),
+            createdDate: newDate,
             name: t.newBudgetName,
             userEmail: db.app.auth().currentUser.email
           })
+          .then(docRef => {
 
+            t.selectedBudgetId = docRef.id
+
+            t.$store.state.budgets.unshift({
+              budget: t.newBudget,
+              createdDate: newDateTS,
+              budgetId: docRef.id,
+              name: t.newBudgetName
+            })
+
+            t.budget = t.newBudget
+            t.expenses = []
+            t.balance = 0.00
+            t.ttlExpenses = 0.00
+          })
+        
+        
+        t.hideNewBudgetModal()
       },
       AddNewExpense(){
         const t = this
@@ -479,6 +477,38 @@ export default {
           }
         })
       },
+      subscribeToBudgetData(){
+        const t = this
+
+        let expensesTmp = []
+
+        t.$store.subscribe((mutation, state) => {
+          if (mutation.type === 'setBudget') {
+            t.selectedBudgetId = state.budgets[0].budgetId
+            t.budget = state.budgets[0].budget
+
+            db.collection('expenses')
+              .where('budgetId','==', t.selectedBudgetId)
+              .orderBy('forDate','desc')
+              .get()
+              .then(querySnapshot => {
+                querySnapshot.forEach((doc) => {
+                    expensesTmp.push({
+                        id: doc.id,
+                        amount: parseFloat(doc.data().amount),
+                        description: doc.data().description,
+                        createdDate: doc.data().forDate.seconds,
+                    })
+                })
+
+                t.expenses = expensesTmp
+
+                t.calcExpenses()
+            })
+
+          }
+        })
+      },
       calcExpenses(){
         const t = this
         t.ttlExpenses = 0
@@ -491,7 +521,9 @@ export default {
         this.$modal.hide('newBudgetModal')
       },
       showNewBudgetModal() {
-        this.$modal.show('newBudgetModal')
+        const t = this
+
+        t.$modal.show('newBudgetModal')       
       }
     },
     directives: {mask, money: VMoney}
