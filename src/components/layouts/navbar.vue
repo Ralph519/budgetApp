@@ -44,7 +44,7 @@ export default {
         return {
             isLoggedIn: false,
             currentUser: false,
-            show: true,
+            show: false,
         }
     },
     created(){
