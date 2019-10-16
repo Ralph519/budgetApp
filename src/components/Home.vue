@@ -3,171 +3,161 @@
 
         <div class="col-md-12">
           <div class="row">
-            <div class="card border-success col-md-4 col-sm-4 mb-3">
-              <div class="form-group">
-                <label for="budgetList">Budget Name</label>
-                <select 
-                  class="form-control" 
-                  id="budgetList" 
-                  v-model="selectedBudgetId"
-                  @change="getBudget"
-                >
-                  <option 
-                    v-for="(budget,index) in budgets" 
-                    :key=budget.budgetId
-                    v-bind:value="budget.budgetId"
-                    @change="setBudgetIndex(index)"
-                  >
-                    {{budget.name}}
-                  </option>
-                </select>
-                <small>
-                  <a href="#!" class="float-left mt-2" @click="showNewBudgetModal"><i class="far fa-calendar-plus mr-1"></i>Create New Budget</a>
-                  <a href="#!" class="float-right text-danger mt-2" @click="DeleteBudget"><i class="far fa-trash-alt mr-1"></i>Delete this budget</a>
-                </small>
+
+            <div class="col-md-4">
+              <div class="row">
+                
+                <div class="card border-success col-md-12 col-sm-12 mb-3">
+                  <div class="form-group">
+                    <label for="budgetList">Budget Name</label>
+                    <select 
+                      class="form-control" 
+                      id="budgetList" 
+                      v-model="selectedBudgetId"
+                      @change="getBudget"
+                    >
+                      <option 
+                        v-for="(budget,index) in budgets" 
+                        :key=budget.budgetId
+                        v-bind:value="budget.budgetId"
+                        @change="setBudgetIndex(index)"
+                      >
+                        {{budget.name}}
+                      </option>
+                    </select>
+                    <small>
+                      <a href="#!" class="float-left mt-2" @click="showNewBudgetModal"><i class="far fa-calendar-plus mr-1"></i>Create New Budget</a>
+                      <a href="#!" class="float-right text-danger mt-2" @click="DeleteBudget"><i class="far fa-trash-alt mr-1"></i>Delete this budget</a>
+                    </small>
+                  </div>
+                </div>
+                 
               </div>
 
-              
-            </div>
-          </div>
-        </div>
+              <div class="row">
+                
+                <div class="card border-success col-md-12 col-sm-12 mb-3">
+                  <div class="card-header">Budget </div>
+                  <div class="card-body">
+                    <div class="form-group">
+                      <label class="col-form-label" for="budget">Please enter your budget</label>
+                      <input 
+                        type="text" 
+                        class="form-control" 
+                        placeholder="Budget 
+                        input" id="budget"
+                        v-model.lazy="budget"
+                        @focus="$event.target.select()"
+                      >
+                      <button type="button" class="form-control btn btn-success mt-2" @click="updateBudget">Calculate</button>
+                    </div>
+                  </div>
+                </div>
 
-        <div class="col-sm-12 col-md-12">
-          <div class="row">
+                
+
+              </div>       
+            </div> <!-- [End First Column] -->
+
+            <div class="col-md-4 col-sm-4">
+              <div class="col-md-12 text-center">
+                <h4 class="text-success">BUDGET</h4>
+                <i class="fas fa-money-bill-alt fa-3x text-success"></i>
+                <h3 class="text-success">{{budget | formatNumber}}</h3>
+                <hr>
+              </div>
             
-            <div class="card border-success col-md-4 col-sm-4 mb-3">
-              <div class="card-header">Budget </div>
-              <div class="card-body">
-                <div class="form-group">
-                  <label class="col-form-label" for="budget">Please enter your budget</label>
-                  <input 
-                    type="text" 
-                    class="form-control" 
-                    placeholder="Budget 
-                    input" id="budget"
-                    v-model.lazy="budget"
-                    @focus="$event.target.select()"
-                  >
-                  <button type="button" class="form-control btn btn-success mt-2" @click="updateBudget">Calculate</button>
+              <div class="col-md-12 text-center">
+                <h4 class="text-danger">EXPENSES</h4>
+                <i class="far fa-credit-card fa-3x text-danger"></i>
+                <h3 class="text-danger">{{ttlExpenses | formatNumber}}</h3>
+                <hr>
+              </div>
+
+              <div class="col-md-12 text-center ml-4">
+                <h4 v-if="balance>0" class="text-success">BALANCE</h4>
+                <h4 v-else class="text-danger">BALANCE</h4>
+                <i v-if="balance>0" class="fas fa-dollar-sign fa-3x text-success"></i>
+                <i v-else class="fas fa-dollar-sign fa-3x text-danger"></i>
+                <h3 v-if="balance>0" class="text-success">{{balance | formatNumber}}</h3>
+                <h3 v-else class="text-danger">{{balance | formatNumber}}</h3>
+                <hr>
+              </div>
+
+              <div class="card text-white col-md-12 col-sm-12 bg-danger mb-3">
+                <div class="card-body">
+                  <div class="form-group">
+                    <label class="col-form-label" for="expensedesc">Description of expense</label>
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      placeholder="Expense description" 
+                      id="expensedesc"
+                      v-model="expenseDesc"
+                      ref="expenseDesc"
+                    >
+
+                    <label class="col-form-label" for="expenseamt">Please enter the amount</label>
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      placeholder="Expense Amount" 
+                      id="expenseamt"
+                      ref="expenseAmt"
+                      v-model.lazy="expenseAmt"
+                      v-money="money"
+                    >
+
+                    <label class="col-form-label" for="expenseamt">Expense for the day</label>
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      placeholder="  /  /    " 
+                      id="expenseFor"
+                      ref="expenseFor"
+                      v-model="expenseFor"
+                      @keydown.enter="AddNewExpense"
+                      v-mask="'##/##/####'"
+                    >
+
+
+                    <button
+                      type="button" 
+                      class="form-control btn btn-warning mt-2"
+                      v-on:click="AddNewExpense"
+                    >
+                      Add new expense
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
 
-          </div>          
-        </div>
-
-        <div class="col-sm-12 col-md-12">
-          <div class="row">
-            <div class="col-md-4 text-center">
-              <h4 class="text-success">BUDGET</h4>
-              <i class="fas fa-money-bill-alt fa-3x text-success"></i>
-              <h3 class="text-success">{{budget | formatNumber}}</h3>
-              <hr>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-sm-12 col-md-12">
-          <div class="row">
-            <div class="col-md-4 text-center">
-              <h4 class="text-danger">EXPENSES</h4>
-              <i class="far fa-credit-card fa-3x text-danger"></i>
-              <h3 class="text-danger">{{ttlExpenses | formatNumber}}</h3>
-              <hr>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-sm-12 col-md-12">
-          <div class="row">
-            <div class="col-md-4 text-center">
-              <h4 v-if="balance>0" class="text-success">BALANCE</h4>
-              <h4 v-else class="text-danger">BALANCE</h4>
-              <i v-if="balance>0" class="fas fa-dollar-sign fa-3x text-success"></i>
-              <i v-else class="fas fa-dollar-sign fa-3x text-danger"></i>
-              <h3 v-if="balance>0" class="text-success">{{balance | formatNumber}}</h3>
-              <h3 v-else class="text-danger">{{balance | formatNumber}}</h3>
-              <hr>
-            </div>
-          </div>
-        </div>
-        
-
-        <div class="col-md-12 col-sm-12">
-          <div class="row">
-            <div class="card text-white col-md-4 col-sm-4 bg-danger mb-3">
-              <div class="card-body">
-                <div class="form-group">
-                  <label class="col-form-label" for="expensedesc">Description of expense</label>
-                  <input 
-                    type="text" 
-                    class="form-control" 
-                    placeholder="Expense description" 
-                    id="expensedesc"
-                    v-model="expenseDesc"
-                    ref="expenseDesc"
-                  >
-
-                  <label class="col-form-label" for="expenseamt">Please enter the amount</label>
-                  <input 
-                    type="text" 
-                    class="form-control" 
-                    placeholder="Expense Amount" 
-                    id="expenseamt"
-                    ref="expenseAmt"
-                    v-model.lazy="expenseAmt"
-                    v-money="money"
-                  >
-
-                  <label class="col-form-label" for="expenseamt">Expense for the day</label>
-                  <input 
-                    type="text" 
-                    class="form-control" 
-                    placeholder="  /  /    " 
-                    id="expenseFor"
-                    ref="expenseFor"
-                    v-model="expenseFor"
-                    @keydown.enter="AddNewExpense"
-                    v-mask="'##/##/####'"
-                  >
-
-
-                  <button
-                    type="button" 
-                    class="form-control btn btn-warning mt-2"
-                    v-on:click="AddNewExpense"
-                  >
-                    Add new expense
-                  </button>
+              <div class="card border-danger col-md-12 col-sm-12 mb-3">
+                <h3 class="card-header text-secondary">Expenses</h3>
+                <div class="card-body">
+                  <div class="col-md-12 border-bottom mt-1" v-for="(expense, index) in expenses" :key=expense.id>
+                    <span class="text-left"><strong>{{expense.description}}</strong></span>
+                    <span style="font-size: 18px;" class="float-right">
+                      {{expense.amount | formatNumber}} 
+                      <a href="#!" 
+                        class="ml-3 text-danger" 
+                        @click="DeleteExpense(expense.id, index)">
+                        <i class="far fa-trash-alt"></i>
+                      </a>
+                    </span>
+                    <p><small>{{expense.createdDate | formatDate}}</small></p>
+                  </div>
+                  <div v-if="expenses.length<=0" class="col-md-12">
+                    <span><p class="text-danger">No expenses for this budget yet</p></span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
 
-        <div class="col-md-12 col-sm-12">
-          <div class="row">
-            <div class="card border-danger col-md-4 col-sm-4 mb-3">
-              <h3 class="card-header text-secondary">Expenses</h3>
-              <div class="card-body">
-                <div class="col-md-12 border-bottom mt-1" v-for="(expense, index) in expenses" :key=expense.id>
-                  <span class="text-left"><strong>{{expense.description}}</strong></span>
-                  <span style="font-size: 18px;" class="float-right">
-                    {{expense.amount | formatNumber}} 
-                    <a href="#!" 
-                      class="ml-3 text-danger" 
-                      @click="DeleteExpense(expense.id, index)">
-                      <i class="far fa-trash-alt"></i>
-                    </a>
-                  </span>
-                  <p><small>{{expense.createdDate | formatDate}}</small></p>
-                </div>
-                <div v-if="expenses.length<=0" class="col-md-12">
-                  <span><p class="text-danger">No expenses for this budget yet</p></span>
-                </div>
-              </div>
-            </div>
+            </div> <!-- [End] Second Column -->
+
           </div>
+
+
         </div>
 
         <!-- New Budget Modal -->
@@ -176,7 +166,7 @@
             name="newBudgetModal"
             transition="nice-modal-fade"
             height="auto"
-            :width="350"
+            :width="window.width<=500 ? 300 : 350"
             :delay="100"
         >
             <div class="card border-secondary">
@@ -278,12 +268,20 @@ export default {
         newBudget: 0.00,
         newBudgetName: '',
         budgetIndex: 0,
+        window: {
+          width: 0
+        }
       }
     },
     created(){
       const t = this
       
+      window.addEventListener('resize', this.handleResize)
+      t.handleResize()
       t.subscribeToBudgetData()
+    },
+    destroyed() {
+      window.removeEventListener('resize', this.handleResize)
     },
     mounted(){
       const t = this
@@ -356,9 +354,6 @@ export default {
       },
       AddNewBudget(){
         const t = this
-
-        t.newBudget = 0
-        t.newBudgetName = ''
 
         if (t.newBudgetName==''){
            Swal.fire({
@@ -562,6 +557,9 @@ export default {
         const t = this
 
         t.budgetIndex = index
+      },
+      handleResize() {
+        this.window.width = window.innerWidth
       }
     },
     directives: {mask, money: VMoney}

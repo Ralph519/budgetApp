@@ -13,7 +13,7 @@
             name="loginModal"
             transition="nice-modal-fade"
             height="auto"
-            :width="350"
+            :width="window.width<=500 ? 300 : 350"
             :delay="100"
         >
             <div class="card border-secondary">
@@ -102,7 +102,10 @@ export default {
     data() {
         return {
             email: '',
-            password: ''
+            password: '',
+            window: {
+                width: 0
+            }
         }
     },
     mounted() {
@@ -113,7 +116,12 @@ export default {
     created() {
         const t = this;
 
+        window.addEventListener('resize', this.handleResize)
+        t.handleResize()
         t.$modal.show('loginModal')
+    },
+    destroyed() {
+        window.removeEventListener('resize', this.handleResize)
     },
     methods: {
         login(){
@@ -161,6 +169,9 @@ export default {
         },
         showloginModal() {
             this.$modal.show('loginModal')
+        },
+        handleResize() {
+            this.window.width = window.innerWidth
         }
     }
 }

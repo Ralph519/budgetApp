@@ -13,7 +13,7 @@
             name="registerModal"
             transition="nice-modal-fade"
             height="auto"
-            :width="350"
+            :width="window.width<=500 ? 300 : 350"
             :delay="100"
         >
             <div class="card border-secondary">
@@ -96,14 +96,25 @@ export default {
     data() {
         return {
             email: '',
-            password: ''
+            password: '',
+            window: {
+                width: 0
+            }
         }
     },
     mounted() {
         this.showRegisterModal()
     },
     created() {
+        const t = this;
+        
+        window.addEventListener('resize', this.handleResize)
+        t.handleResize()
+
         this.showRegisterModal()
+    },
+    destroyed() {
+        window.removeEventListener('resize', this.handleResize)
     },
     methods: {
         register(){
@@ -129,6 +140,9 @@ export default {
         },
         showRegisterModal() {
             this.$modal.show('registerModal')
+        },
+        handleResize() {
+            this.window.width = window.innerWidth
         }
     }
 }
