@@ -74,7 +74,7 @@
                 <hr>
               </div>
 
-              <div class="col-md-12 text-center ml-4">
+              <div class="col-md-12 text-center">
                 <h4 v-if="balance>0" class="text-success">BALANCE</h4>
                 <h4 v-else class="text-danger">BALANCE</h4>
                 <i v-if="balance>0" class="fas fa-dollar-sign fa-3x text-success"></i>
