@@ -5,10 +5,10 @@
           <div class="row">
 
             <div class="col-md-4">
-              <div class="row">
+              <!-- <div class="row"> -->
                 
                 <div class="card border-success col-md-12 col-sm-12 mb-3">
-                  <div class="form-group">
+                  <div class="form-group mb-1">
                     <label for="budgetList">Budget Name</label>
                     <select 
                       class="form-control" 
@@ -30,13 +30,13 @@
                       <a href="#!" class="float-right text-danger mt-2" @click="DeleteBudget"><i class="far fa-trash-alt mr-1"></i>Delete this budget</a>
                     </small>
                   </div>
-                </div>
+                <!-- </div> -->
                  
               </div>
 
-              <div class="row">
-                
-                <div class="card border-success col-md-12 col-sm-12 mb-3">
+              <!-- <div class="row"> -->
+
+                <div class="card border-success mb-3">
                   <div class="card-header">Budget </div>
                   <div class="card-body">
                     <div class="form-group">
@@ -56,7 +56,7 @@
 
                 
 
-              </div>       
+              <!-- </div>        -->
             </div> <!-- [End First Column] -->
 
             <div class="col-md-4 col-sm-4">
@@ -131,11 +131,11 @@
                   </div>
                 </div>
               </div>
-
-              <div class="card border-danger col-md-12 col-sm-12 mb-3">
-                <h3 class="card-header text-secondary">Expenses</h3>
+              
+              <div class="card border-danger mb-3" style="max-width: 20rem;">
+                <div class="card-header">Expenses</div>
                 <div class="card-body">
-                  <div class="col-md-12 border-bottom mt-1" v-for="(expense, index) in expenses" :key=expense.id>
+                  <div class="border-bottom mt-1" v-for="(expense, index) in expenses" :key=expense.id>
                     <span class="text-left"><strong>{{expense.description}}</strong></span>
                     <span style="font-size: 18px;" class="float-right">
                       {{expense.amount | formatNumber}} 
@@ -147,7 +147,7 @@
                     </span>
                     <p><small>{{expense.createdDate | formatDate}}</small></p>
                   </div>
-                  <div v-if="expenses.length<=0" class="col-md-12">
+                  <div v-if="expenses.length<=0">
                     <span><p class="text-danger">No expenses for this budget yet</p></span>
                   </div>
                 </div>
