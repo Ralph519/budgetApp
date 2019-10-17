@@ -1,6 +1,8 @@
 <template>
     <div class="container mt-5" id="Home">
 
+        <loading :active.sync="visible" :can-cancel="true"></loading>
+
         <div class="col-md-12">
           <div class="row">
 
@@ -239,11 +241,15 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import { mapState } from 'vuex'
 import db from '../firebase'
 import Swal from 'sweetalert2'
 import {mask} from 'vue-the-mask'
 import {VMoney} from 'v-money'
+import VueLoading from 'vue-loading-overlay';
+
+Vue.use(VueLoading);
 
 export default {
     name: 'home',
@@ -270,7 +276,8 @@ export default {
         budgetIndex: 0,
         window: {
           width: 0
-        }
+        },
+        visible: false
       }
     },
     created(){
@@ -279,6 +286,11 @@ export default {
       window.addEventListener('resize', this.handleResize)
       t.handleResize()
       t.subscribeToBudgetData()
+
+      // loading spinner
+      // let loader = this.$loading.show({
+      //     loader: 'dots'
+      // });
     },
     destroyed() {
       window.removeEventListener('resize', this.handleResize)
@@ -294,7 +306,7 @@ export default {
     methods: {
       getBudget(){
         const t = this;
-
+        t.visible = true
         t.budget = 0.00
 
         db.collection('budget')
@@ -305,6 +317,7 @@ export default {
               t.budget = parseFloat(snapshot.data().budget)
               t.loadExpenseData()
             }
+            t.visible = false
           })
 
       },  
@@ -507,7 +520,7 @@ export default {
       },
       subscribeToBudgetData(){
         const t = this
-
+        this.visible = true
         let expensesTmp = []
 
         t.$store.subscribe((mutation, state) => {
@@ -515,6 +528,7 @@ export default {
             t.selectedBudgetId = state.budgets[0].budgetId
             t.budget = state.budgets[0].budget
 
+            
             db.collection('expenses')
               .where('budgetId','==', t.selectedBudgetId)
               .orderBy('forDate','desc')
@@ -532,6 +546,7 @@ export default {
                 t.expenses = expensesTmp
 
                 t.calcExpenses()
+                this.visible = false
             })
 
           }
@@ -561,6 +576,9 @@ export default {
       handleResize() {
         this.window.width = window.innerWidth
       }
+    },
+    components: {
+        Loading: VueLoading
     },
     directives: {mask, money: VMoney}
 }

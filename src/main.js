@@ -7,11 +7,13 @@ import { store } from "./store";
 import moment from 'moment'
 
 import VueAnalytics from 'vue-analytics'
+import 'vue-loading-overlay/dist/vue-loading.css';
 
 Vue.use(VueAnalytics, {
   id: 'UA-134948154-1',
 })
-    
+
+
 Vue.use(vmodal)
 Vue.config.productionTip = false
 
