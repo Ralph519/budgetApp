@@ -548,9 +548,11 @@ export default {
                 t.calcExpenses()
                 this.visible = false
             })
-
+            
           }
         })
+
+        this.visible = false
       },
       calcExpenses(){
         const t = this
