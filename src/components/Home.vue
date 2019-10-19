@@ -277,7 +277,8 @@ export default {
         window: {
           width: 0
         },
-        visible: false
+        visible: false,
+        loader: 'dots'
       }
     },
     created(){
@@ -524,35 +525,39 @@ export default {
         let expensesTmp = []
 
         t.$store.subscribe((mutation, state) => {
+          
           if (mutation.type === 'setBudget') {
-            t.selectedBudgetId = state.budgets[0].budgetId
-            t.budget = state.budgets[0].budget
-
+            if(state.budgets.length>0){
             
-            db.collection('expenses')
-              .where('budgetId','==', t.selectedBudgetId)
-              .orderBy('forDate','desc')
-              .get()
-              .then(querySnapshot => {
-                querySnapshot.forEach((doc) => {
-                    expensesTmp.push({
-                        id: doc.id,
-                        amount: parseFloat(doc.data().amount),
-                        description: doc.data().description,
-                        createdDate: doc.data().forDate.seconds,
+              t.selectedBudgetId = state.budgets[0].budgetId
+              t.budget = state.budgets[0].budget
+
+              
+              db.collection('expenses')
+                .where('budgetId','==', t.selectedBudgetId)
+                .orderBy('forDate','desc')
+                .get()
+                .then(querySnapshot => {
+                    querySnapshot.forEach((doc) => {
+                        expensesTmp.push({
+                            id: doc.id,
+                            amount: parseFloat(doc.data().amount),
+                            description: doc.data().description,
+                            createdDate: doc.data().forDate.seconds,
+                        })
                     })
-                })
 
-                t.expenses = expensesTmp
+                  t.expenses = expensesTmp
 
-                t.calcExpenses()
-                this.visible = false
-            })
-            
+                  t.calcExpenses()
+                  this.visible = false
+              })
+            }  else {
+              this.visible = false
+            }
           }
         })
 
-        this.visible = false
       },
       calcExpenses(){
         const t = this
