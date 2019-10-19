@@ -521,8 +521,12 @@ export default {
       },
       subscribeToBudgetData(){
         const t = this
-        this.visible = true
+        // this.visible = true
         let expensesTmp = []
+
+        let loader = this.$loading.show({
+            loader: 'dots'
+        });
 
         t.$store.subscribe((mutation, state) => {
           
@@ -550,10 +554,12 @@ export default {
                   t.expenses = expensesTmp
 
                   t.calcExpenses()
-                  this.visible = false
+                  // this.visible = false
+                  loader.hide()
               })
             }  else {
-              this.visible = false
+              // this.visible = false
+              loader.hide()
             }
           }
         })
