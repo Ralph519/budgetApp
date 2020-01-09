@@ -11,6 +11,7 @@ import 'vue-loading-overlay/dist/vue-loading.css';
 
 Vue.use(VueAnalytics, {
   id: 'UA-134948154-1',
+  router
 })
 
 
